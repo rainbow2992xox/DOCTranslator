@@ -76,6 +76,7 @@ def get_paragraphs(docx_file):
                 tb_title = title
         row_idx =1
         for row in table.rows:
+            cell_id = 0
             for cell in row.cells:
                 if cell.text:
 
@@ -87,17 +88,11 @@ def get_paragraphs(docx_file):
                         idx += 1
 
                     [t_list.extend(e.replace("$&$", ".").split("。")) for e in p_text.split('.')]
-
-                    t_id = 1
-                    chunk_id = 1
+                    tb_title = tb_title + ' 行号：' + str(row_idx) + ' 单元格号：' + str(cell_id)
                     for t in t_list:
-                        tb_title = tb_title + ' 行号：' + str(row_idx) + ' 组号：' + str(chunk_id)
                         if t:
-                            paragraphs.append({'title':tb_title , 'type': 'text', 'text': t})
-                            t_id += 1
-                        if t_id > 10:
-                            chunk_id += 1
-                            t_id = 0
+                            paragraphs.append({'title': tb_title, 'type': 'text', 'text': t})
+                cell_id += 1
             row_idx += 1
 
     return paragraphs
