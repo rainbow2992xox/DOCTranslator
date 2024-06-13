@@ -24,10 +24,6 @@ class doc_translation_paragraphs(models.Model):
     target_paragraph = fields.Text(related='target.text', string='Target content')
     source_paragraph = fields.Text(related='source.text', string='Source content')
 
-    @api.model
-    def web_search_read(self, domain=None, fields=None, offset=0, limit=None, order=None):
-        return super(doc_translation_paragraphs, self).web_search_read(domain, fields, offset, limit, order)
-
     def action_extract(self):
         doc_definition = self.source.doc_file.doc_definition
         doc_ontologys = doc_definition.doc_ontologys
