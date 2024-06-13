@@ -246,8 +246,8 @@ class doc_translation_files(models.Model):
         print(temp_file_path)
 
         p_list = get_paragraphs(temp_file_path)
-
-
+        print(len(p_list))
+        print("----------------------------开始新建段落------------------------------")
         self.env['doc.paragraph'].sudo().create(
             [{'text': p['text'], 'index': p_list.index(p), 'lang': doc_file.lang.id, 'title': p['title'], 'type': '1',
               'doc_file': doc_file.id} for p in p_list if p['type'] == 'title'])
@@ -255,6 +255,8 @@ class doc_translation_files(models.Model):
             [{'text': p['text'], 'index': p_list.index(p), 'lang': doc_file.lang.id, 'title': p['title'], 'type': '2',
               'doc_file': doc_file.id} for p in p_list if p['type'] == 'text'])
         t_list = get_tables(temp_file_path)
+        print(len(t_list))
+        print("----------------------------开始新建表格------------------------------")
         self.env['doc.paragraph'].sudo().create([{'text': json.dumps(t[1], ensure_ascii=False), 'index': t[0],
                                                   'lang': doc_file.lang.id, 'type': '3', 'doc_file': doc_file.id} for t
                                                  in t_list])

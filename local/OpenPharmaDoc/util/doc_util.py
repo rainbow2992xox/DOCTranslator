@@ -70,7 +70,6 @@ def get_paragraphs(docx_file):
     # TODO TABEL加段落
     tb_idx = 0
     for table in doc.tables:
-        t_list = []
         tb_title = ' '
         for title in title_index:
             if tb_idx in title_index[title]:
@@ -78,6 +77,8 @@ def get_paragraphs(docx_file):
         row_idx =1
         for row in table.rows:
             for cell in row.cells:
+                t_list = []
+                cell_id = 0
                 if cell.text:
                     p_text = cell.text
                     print(p_text)
@@ -88,10 +89,11 @@ def get_paragraphs(docx_file):
                         idx += 1
 
                     [t_list.extend(e.replace("$&$", ".").split("。")) for e in p_text.split('.')]
-                    title = tb_title + ' 行号：' + str(row_idx)
+                    title = tb_title + ' 行号：' + str(row_idx) + ' 列号：' + str(cell_id)
                     for t in t_list:
                         if t:
                             paragraphs.append({'title': title, 'type': 'text', 'text': t})
+                cell_id += 1
             row_idx += 1
 
     return paragraphs
