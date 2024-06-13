@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id='pharma_doc_definition_action' model='ir.actions.act_window'>
+        <field name="name">Document Definition</field>
+        <field name="res_model">doc.definition</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="doc_definition_view_tree" model="ir.ui.view">
+        <field name="name">doc.definition.tree</field>
+        <field name="model">doc.definition</field>
+        <field name="arch" type="xml">
+            <tree string="Document Definition" sample="1">
+                <field name="create_date"/>
+                <field name="name"/>
+                <field name="doc_ontologys"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

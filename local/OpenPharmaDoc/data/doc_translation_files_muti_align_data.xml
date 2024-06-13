@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.actions.server" id="action_doc_align">
+            <field name="name">Align</field>
+            <field name="model_id" ref="model_doc_translation_files"/>
+            <field name="binding_model_id" ref="model_doc_translation_files"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">action = records.align()</field>
+        </record>
+
+    </data>
+</odoo>

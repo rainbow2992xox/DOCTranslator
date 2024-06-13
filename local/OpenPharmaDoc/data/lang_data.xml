@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="doc.lang" id="1">
+            <field name="name">en</field>
+        </record>
+        <record model="doc.lang" id="2">
+            <field name="name">cn</field>
+        </record>
+    </data>
+</odoo>

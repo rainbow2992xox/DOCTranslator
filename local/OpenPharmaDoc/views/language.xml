@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id='pharma_doc_language_action' model='ir.actions.act_window'>
+        <field name="name">Language</field>
+        <field name="res_model">doc.lang</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

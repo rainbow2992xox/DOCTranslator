@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id='pharma_doc_ai_action' model='ir.actions.act_window'>
+        <field name="name">Document AI</field>
+        <field name="res_model">doc.task</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="doc_task_view_tree" model="ir.ui.view">
+        <field name="name">doc.task.tree</field>
+        <field name="model">doc.task</field>
+        <field name="arch" type="xml">
+            <tree string="Document AI" sample="1" default_order="create_date desc">
+                <field name="type"/>
+                <field name="msd_usr_id"/>
+                <field name="doc_definition"/>
+                <field name="input_file"/>
+                <field name="output_file"/>
+                <field name="status" widget="badge" decoration-info="status == '1'" decoration-success="status == '2'"/>
+                <field name="score"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="doc_task_view_form" model="ir.ui.view">
+        <field name="name">doc.task.form</field>
+        <field name="model">doc.task</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <header style="text-align:justify;">
+                        <field name="status" widget="badge" decoration-info="status == '1'" decoration-success="status == '2'"/>
+                        <button name="action_start" string="Start" type="object" class="btn-primary"/>
+                    </header>
+                    <separator/>
+                    <group>
+                        <h3>Setting</h3>
+                    </group>
+                    <group col="4">
+                        <group>
+                            <field name="type"/>
+                        </group>
+                        <group>
+                            <field name="msd_usr_id"/>
+                        </group>
+                        <group>
+                            <field name="doc_definition"/>
+                        </group>
+
+                    </group>
+                    <separator/>
+                    <group>
+                        <group>
+                            <field name="input_file" readonly="1"/>
+                        </group>
+                        <group>
+                            <button name="open_input_file_create_form" string="Upload" type="object" class="btn-primary"/>
+                        </group>
+
+                    </group>
+                    <separator/>
+                    <group>
+                        <h3>Result</h3>
+                        <br/>
+                        <field name="progress" widget="progressbar"/>
+                        <field name="output_file" readonly="1"/>
+                        <field name="score"/>
+                    </group>
+                    <separator/>
+                    <group>
+                        <field name="queue_task_id" readonly="1"/>
+                    </group>
+                    <separator/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

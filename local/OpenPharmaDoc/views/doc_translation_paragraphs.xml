@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id='pharma_doc_translation_paragraphs_action' model='ir.actions.act_window'>
+        <field name="name">Document Translation Paragraphs</field>
+        <field name="res_model">doc.translation.paragraphs</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="doc_translation_paragraphs_view_tree" model="ir.ui.view">
+        <field name="name">doc.translation.paragraphs.tree</field>
+        <field name="model">doc.translation.paragraphs</field>
+        <field name="arch" type="xml">
+            <tree string="Document Translation Paragraphs" default_order="create_date desc">
+                <field name="source_paragraph"/>
+                <field name="target_paragraph"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="doc_translation_paragraphs_view_form" model="ir.ui.view">
+        <field name="name">doc.translation.paragraphs.form</field>
+        <field name="model">doc.translation.paragraphs</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <header>
+                        <button name="action_extract" string="Extract Entity" type="object" class="btn-primary"/>
+                    </header>
+                    <separator/>
+                    <group col="2">
+                        <group>
+                            <field name="source_paragraph"/>
+                        </group>
+                        <group>
+                            <field name="target_paragraph"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

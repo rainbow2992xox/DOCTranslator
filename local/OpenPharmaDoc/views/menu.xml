@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem name="OpenPharmaDoc" id="pharma_doc_base_menu"/>
+
+        <menuitem name="Document AI" id="pharma_doc_ai_menu" parent="pharma_doc_base_menu" action="pharma_doc_ai_action"/>
+
+        <menuitem name="Task Quene" id="pharma_doc_quene_task_menu" parent="pharma_doc_base_menu" action="pharma_doc_quene_task_action"/>
+
+        <menuitem name="Knowledge" id="pharma_doc_knowledge_menu" parent="pharma_doc_base_menu"/>
+        <menuitem name="Document Definition" id="pharma_doc_definition_menu" parent="pharma_doc_knowledge_menu" action="pharma_doc_definition_action"/>
+        <menuitem name="Document Ontology" id="pharma_doc_ontology_menu" parent="pharma_doc_knowledge_menu" action="pharma_doc_ontology_action"/>
+
+        <menuitem name="Corpus" id="pharma_doc_corpus_menu" parent="pharma_doc_base_menu"/>
+
+        <menuitem name="Translation" id="pharma_doc_translation_menu" parent="pharma_doc_corpus_menu"/>
+        <menuitem name="File" id="pharma_doc_translation_files_menu" parent="pharma_doc_translation_menu" action="pharma_doc_translation_files_action" sequence="1"/>
+        <menuitem name="Paragraph" id="pharma_doc_translation_paragraph_menu" parent="pharma_doc_translation_menu" action="pharma_doc_translation_paragraphs_action"/>
+        <menuitem name="Technical terms" id="pharma_doc_translation_technical_terms_menu" parent="pharma_doc_translation_menu" action="pharma_doc_translation_technical_terms_action"/>
+
+        <record id="action_doc_knowledge_graph" model="ir.actions.client">
+            <field name="name">Knowledge graph</field>
+            <field name="tag">owl.knowledge_graph</field>
+            <field name="target">main</field>
+        </record>
+
+<!--        <menuitem name="Knowledge graph" id="pharma_doc_knowledge_graph" parent="pharma_doc_base_menu" action="action_doc_knowledge_graph"/>-->
+
+        <menuitem name="Data" id="pharma_doc_graph_menu" parent="pharma_doc_base_menu"/>
+        <menuitem name="File" id="pharma_doc_file_menu" parent="pharma_doc_graph_menu" action="pharma_doc_translation_file_action" sequence="1"/>
+        <menuitem name="Paragraph" id="pharma_doc_paragraph_menu" parent="pharma_doc_graph_menu" action="pharma_doc_translation_paragraph_action"/>
+        <menuitem name="Entity" id="pharma_doc_entity_menu" parent="pharma_doc_graph_menu" action="pharma_doc_translation_entity_action"/>
+
+        <menuitem name="Config" id="pharma_doc_config_menu" parent="pharma_doc_base_menu"/>
+        <menuitem name="Language" id="pharma_doc_language_menu" parent="pharma_doc_config_menu" action="pharma_doc_language_action"/>
+
+
+    </data>
+
+
+</odoo>

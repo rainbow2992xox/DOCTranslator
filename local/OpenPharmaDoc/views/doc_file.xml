@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id='pharma_doc_translation_file_action' model='ir.actions.act_window'>
+        <field name="name">Document File</field>
+        <field name="res_model">doc.file</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="doc_file_view_tree" model="ir.ui.view">
+        <field name="name">doc.file.tree</field>
+        <field name="model">doc.file</field>
+        <field name="arch" type="xml">
+            <tree string="Document File" default_order="create_date desc">
+                <field name="create_date"/>
+                <field name="name"/>
+                <field name="file" filename="name"/>
+                <field name="doc_definition"/>
+                <field name="doc_paragraphs"/>
+                <field name="lang"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="doc_file_view_form" model="ir.ui.view">
+        <field name="name">doc.file.form</field>
+        <field name="model">doc.file</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <separator/>
+                    <group>
+                        <field name="name" invisible="1"/>
+                        <field name="file" filename="name"/>
+                        <field name="origin_file" invisible="origin_file == False"/>
+                        <field name="msd_usr_id"/>
+                        <field name="lang"/>
+                    </group>
+                    <group>
+                        <field name="doc_paragraphs"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

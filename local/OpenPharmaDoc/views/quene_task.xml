@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id='pharma_doc_quene_task_action' model='ir.actions.act_window'>
+        <field name="name">Quene Task</field>
+        <field name="res_model">doc.quene.task</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="doc_quene_task_view_tree" model="ir.ui.view">
+        <field name="name">doc.quene.task.tree</field>
+        <field name="model">doc.quene.task</field>
+        <field name="arch" type="xml">
+            <tree string="Model Task" sample="1" default_order="create_date desc">
+                <field name="type"/>
+                <field name="source_text"/>
+                <field name="target_text"/>
+                <field name="score"/>
+                <field name="target_align_paragraphs"/>
+                <field name="source_align_paragraphs"/>
+                <field name="status" widget="badge" decoration-info="status == '1'" decoration-success="status == '2'"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>

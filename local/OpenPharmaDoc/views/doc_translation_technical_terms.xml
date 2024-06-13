@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id='pharma_doc_translation_technical_terms_action' model='ir.actions.act_window'>
+        <field name="name">Document Translation Technical Terms</field>
+        <field name="res_model">doc.translation.technical.terms</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="doc_translation_technical_terms_view_tree" model="ir.ui.view">
+        <field name="name">doc.translation.technical.terms.tree</field>
+        <field name="model">doc.translation.technical.terms</field>
+        <field name="arch" type="xml">
+            <tree string="Document Translation Technical Terms" default_order="create_date desc">
+                <field name="source_entity_type"/>
+                <field name="source_term_attribute_name"/>
+                <field name="source_term"/>
+                <field name="target_term"/>
+                <field name="status" widget="badge" decoration-info="status == '1'" decoration-success="status == '2'"/>
+                <button name="action_accept" string="Accept" type="object" class="btn-primary"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="doc_translation_technical_terms_view_form" model="ir.ui.view">
+        <field name="name">doc.translation.technical.terms.form</field>
+        <field name="model">doc.translation.technical.terms</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group col="2">
+                            <group>
+                                <field name="source_entity_type"/>
+                            </group>
+                            <group>
+                                <field name="source_term_attribute_name"/>
+                            </group>
+                        </group>
+                        <group col="2">
+                            <group>
+                                <field name="source_term"/>
+                            </group>
+                            <group>
+                                <field name="target_term"/>
+                            </group>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>
