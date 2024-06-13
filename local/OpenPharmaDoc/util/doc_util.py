@@ -90,11 +90,10 @@ def get_paragraphs(docx_file):
                         idx += 1
 
                     [t_list.extend(e.replace("$&$", ".").split("。")) for e in p_text.split('.')]
-                    tb_title = tb_title + ' 行号：' + str(row_idx) + ' 单元格号：' + str(cell_id)
+                    title = tb_title + ' 行号：' + str(row_idx) + ' 单元格号：' + str(cell_id)
                     for t in t_list:
                         if t:
-                            print({'title': tb_title, 'type': 'text', 'text': t})
-                            paragraphs.append({'title': tb_title, 'type': 'text', 'text': t})
+                            paragraphs.append({'title': title, 'type': 'text', 'text': t})
                 cell_id += 1
             row_idx += 1
 
