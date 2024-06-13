@@ -52,6 +52,7 @@ def get_paragraphs(docx_file):
                     p_text = replace_char_at(p_text, idx, "$&$")
                 idx += 1
 
+            print(p_text)
             [t_list.extend(e.replace("$&$", ".").split("。")) for e in p_text.split('.')]
             [paragraphs.append({'title': c_title, 'type': 'text', 'text': t}) for t in t_list if t]
 
@@ -81,6 +82,7 @@ def get_paragraphs(docx_file):
                 if cell.text:
 
                     p_text = cell.text
+                    print(p_text)
                     idx = 0
                     for char in p_text:
                         if char == '.' and is_number(p_text[idx - 1]):
@@ -91,6 +93,7 @@ def get_paragraphs(docx_file):
                     tb_title = tb_title + ' 行号：' + str(row_idx) + ' 单元格号：' + str(cell_id)
                     for t in t_list:
                         if t:
+                            print({'title': tb_title, 'type': 'text', 'text': t})
                             paragraphs.append({'title': tb_title, 'type': 'text', 'text': t})
                 cell_id += 1
             row_idx += 1
