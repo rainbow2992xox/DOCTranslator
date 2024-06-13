@@ -111,8 +111,8 @@ class quene_task(models.Model):
                             msd_usr_id = source_paragraph.doc_file.msd_usr_id
                             data = {getLabel(rec.source_lang, 'name'): item[getLabel(rec.source_lang, 'name')]['text'], getLabel(rec.target_lang, 'name'): item[getLabel(rec.target_lang, 'name')]['text']}
                             # 判断没有对齐过的再添加至向量数据库
-                            if not self.if_align_done(item[getLabel(rec.source_lang, 'name')]['text'], item[getLabel(rec.target_lang, 'name')]['text']):
-                                add_data(data, msd_usr_id if msd_usr_id else None)
+                            # if not self.if_align_done(item[getLabel(rec.source_lang, 'name')]['text'], item[getLabel(rec.target_lang, 'name')]['text']):
+                            add_data(data, msd_usr_id if msd_usr_id else None)
                         rec.status = '3'
                     else:
                         rec.status = '4'
