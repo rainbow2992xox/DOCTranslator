@@ -3,6 +3,7 @@ import time
 
 import aiohttp
 import json
+import os
 from openai import AsyncAzureOpenAI
 
 client = AsyncAzureOpenAI(
