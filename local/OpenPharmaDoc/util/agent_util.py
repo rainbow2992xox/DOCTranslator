@@ -10,10 +10,11 @@ import sys
 url = 'http://languagerepo-devtest.merck.com:30124'
 # url = 'http://lit-research-poc.merck.com:30124'
 
+n_jobs = 32
 
 def agent_align(doc_dict):
     payload = {
-        "task": "duiqi", "data": doc_dict
+        "task": "duiqi", "data": doc_dict,"n_jobs":n_jobs
     }
 
     headers = {
@@ -23,7 +24,6 @@ def agent_align(doc_dict):
     while True:
         try:
             print(payload)
-
             res = requests.request('POST', url, headers=headers, json=payload)
             print(res.json())
             return res.json()['result']
@@ -81,11 +81,37 @@ def add_data(adata, db_name=None):
     print(res.json())
     return res.json()
 
+def agent_score(text_dict):
+    payload = {
+        "task": "get_relate_score", "data": text_dict
+    }
 
-def agent_translate(text, source_lang, target_lang, technical_terms, db_name=None):
+    headers = {
+        'Content-Type': 'application/json',
+    }
+
+    try_count = 0
+    while True:
+        try:
+            res = requests.request('POST', url, headers=headers, json=payload)
+            print(payload)
+            print(payload)
+            print(res.json())
+            return res.json()['result']
+        except Exception as e:
+            try_count += 1
+            print('-----实体提取失败重试-----')
+            print(e)
+            time.sleep(1)
+
+        if try_count >= 3:
+            return False
+
+def agent_translate(texts, source_lang, target_lang, technical_terms, db_name=None):
     payload = {
         "task": "translate",
-        "text": text,
+        "n_jobs":n_jobs,
+        "texts": texts,
         "language_origin": source_lang,
         "language_target": target_lang,
         "entity_knowledges": technical_terms
@@ -105,11 +131,11 @@ def agent_translate(text, source_lang, target_lang, technical_terms, db_name=Non
             print(payload)
             print(res.json())
             res = res.json()['result']
-            return (res['result'], res['score'], res['references'])
+            return res
         except Exception as e:
             try_count += 1
             print('-----翻译失败重试-----')
-            print(text)
+            print(texts)
             print(e)
             time.sleep(1)
 

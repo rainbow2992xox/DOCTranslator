@@ -11,13 +11,6 @@ import os
 import sys
 
 
-# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# print(sys.path)
-# import translator.Translator_main as ts
-
-
-# from ..translator import Translator_main as ts
-
 
 class doc_translation_files(models.Model):
     _name = 'doc.translation.files'
@@ -106,15 +99,11 @@ class doc_translation_files(models.Model):
             return False
 
 
-
-
     def align(self):
         for rec in self:
             # 修改状态
             if rec.if_align == '1':
                 rec.if_align = '2'
-                self.action_extract(rec.target_file, rec.target)
-                self.action_extract(rec.source_file, rec.source)
 
                 # 先对其段落标题
                 target_title_list = self.env['doc.paragraph'].sudo().search(
@@ -153,7 +142,8 @@ class doc_translation_files(models.Model):
                         # 对其的标题入库
                         self.env['doc.translation.paragraphs'].sudo().create(
                             {'target': item[getLabel(rec.target.lang, 'name')]['id'],
-                             'source': item[getLabel(rec.source.lang, 'name')]['id']})
+                             'source': item[getLabel(rec.source.lang, 'name')]['id'],
+                             'score':item['score']})
 
                         # 判断没有对齐过的再添加至向量数据库
                         if not self.if_align_done(item[getLabel(rec.source.lang, 'name')]['text'], item[getLabel(rec.target.lang, 'name')]['text']):
@@ -237,27 +227,4 @@ class doc_translation_files(models.Model):
 
                         self.env.cr.commit()
 
-    def action_extract(self, file_binary, doc_file):
-        temp_folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'temp')
-        temp_file_path = os.path.join(temp_folder_path, doc_file.name)
-        binary_data = base64.b64decode(file_binary)
-        with open(temp_file_path, 'wb') as f:
-            f.write(binary_data)
-        print(temp_file_path)
 
-        p_list = get_paragraphs(temp_file_path)
-        print(len(p_list))
-        print("----------------------------开始新建段落------------------------------")
-        self.env['doc.paragraph'].sudo().create(
-            [{'text': p['text'], 'index': p_list.index(p), 'lang': doc_file.lang.id, 'title': p['title'], 'type': '1',
-              'doc_file': doc_file.id} for p in p_list if p['type'] == 'title'])
-        self.env['doc.paragraph'].sudo().create(
-            [{'text': p['text'], 'index': p_list.index(p), 'lang': doc_file.lang.id, 'title': p['title'], 'type': '2',
-              'doc_file': doc_file.id} for p in p_list if p['type'] == 'text'])
-        t_list = get_tables(temp_file_path)
-        print(len(t_list))
-        print("----------------------------开始新建表格------------------------------")
-        self.env['doc.paragraph'].sudo().create([{'text': json.dumps(t[1], ensure_ascii=False), 'index': t[0],
-                                                  'lang': doc_file.lang.id, 'type': '3', 'doc_file': doc_file.id} for t
-                                                 in t_list])
-        os.remove(temp_file_path)

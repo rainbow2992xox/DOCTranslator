@@ -19,10 +19,22 @@ import json
 
 class doc_translation_paragraphs(models.Model):
     _name = 'doc.translation.paragraphs'
-    target = fields.Many2one('doc.paragraph', string='Target paragraph', readonly=True)
-    source = fields.Many2one('doc.paragraph', string='Source paragraph', readonly=True)
-    target_paragraph = fields.Text(related='target.text', string='Target content')
-    source_paragraph = fields.Text(related='source.text', string='Source content')
+    target = fields.Many2one('doc.paragraph', string='Target paragraph')
+    source = fields.Many2one('doc.paragraph', string='Source paragraph')
+    source_filename = fields.Char(related='source.doc_file.name', string='Source file name', readonly=True)
+    target_filename = fields.Char(related='target.doc_file.name', string='Target file name', readonly=True)
+    target_paragraph = fields.Text(related='target.text', string='Target content', readonly=False)
+    source_paragraph = fields.Text(related='source.text', string='Source content', readonly=False)
+    score = fields.Float(string='Score',digits=(10,2), readonly=True)
+
+    def action_update(self):
+        for rec in self:
+            data = {getLabel(rec.source.lang, 'name'): rec.source_paragraph, getLabel(rec.target.lang, 'name'): rec.target_paragraph}
+            score = agent_score(data)
+            rec.score = score
+            # 判断没有对齐过的再添加至向量数据库
+            # if not self.if_align_done(item[getLabel(rec.source_lang, 'name')]['text'], item[getLabel(rec.target_lang, 'name')]['text']):
+            add_data(data, rec.source.doc_file.msd_usr_id if rec.source.doc_file.msd_usr_id else None)
 
     def action_extract(self):
         doc_definition = self.source.doc_file.doc_definition
@@ -30,8 +42,8 @@ class doc_translation_paragraphs(models.Model):
         for o in doc_ontologys:
             print(o.name)
             doc_ontology_attributes = o.doc_ontology_attributes
-            s_text =  self.source_paragraph
-            t_text =  self.target_paragraph
+            s_text = self.source_paragraph
+            t_text = self.target_paragraph
             input_dict = {
                 getLabel(self.source.lang, 'name'): s_text,
                 getLabel(self.target.lang, 'name'): t_text,

@@ -1,66 +1,130 @@
+import math
+import json
+import time
 import docx
-from docx import Document
-from docx.enum.style import WD_STYLE_TYPE
-from docx.oxml.ns import nsdecls
-from docx.oxml import parse_xml
-from docx.shared import RGBColor
-from docx.shared import Pt
+
+from bs4 import BeautifulSoup
 
 
-# doc = docx.Document('C:\\Users\\Rainbow\\Downloads\\MK-3543-008-00-DEMO-CN (6).docx')
-#
-#
-#
-# # doc = docx.Document('C:\\Users\\Rainbow\\Desktop\\Odoo\\DocTranslator\\data\\chenyufe\\alignment\\MK-3543-007-00-DEMO-CN.docx')
-# # doc.styles.default("Normal")
-# for paragraph in doc.paragraphs:
-#     # paragraph.style.name = 'MyBodyText'
-#     paragraph.insert_paragraph_before(paragraph.text, 'MyBodyText')
-#     paragraph.clear()
-
-# for p in doc.paragraphs:
-#     print(p)
-#
-# doc2 = docx.Document('C:\\Users\\Rainbow\\Desktop\\Odoo\\DocTranslator\\data\\chenyufe\\alignment\\MK-3543-007-00-DEMO-CN.docx')
-# for p in doc2.paragraphs:
-#     print(p)
-# 转换文本框为普通文本
-# 保存文档
-# doc.save('C:\\Users\\Rainbow\\Downloads\\MK-3543-008-00-DEMO-CN (convert).docx')
-
-from docx import Document
-from docx.oxml.ns import qn
-from docx.oxml import OxmlElement
+def extract_text(html):
+    soup = BeautifulSoup(html, 'html.parser')  # 创建BeautifulSoup对象
+    text = soup.get_text()  # 提取所有文本内容
+    return text
 
 
-def remove_framePr_from_paragraphs(doc_path):
-    doc = Document(doc_path)
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+
+def replace_char_at(s, index, new_char):
+    return s[:index] + new_char + s[index + 1:]
+
+
+def get_spire_paragraphs(docx_file):
+    pass
+
+
+def get_paragraphs(docx_file):
+    doc = docx.Document(docx_file)
+    paragraphs = []
+    c_title = ''
+    title_list = []
+    title_index = {
+        ' ': []
+    }
 
     for paragraph in doc.paragraphs:
-        _remove_framePr(paragraph._element)
+        t_list = []
+        if paragraph.style.name.startswith('Heading') and paragraph.text:
+            c_title = paragraph.text
+            paragraphs.append({'type': 'title', 'title': c_title, 'text': paragraph.text})
+            title_list.append(c_title)
+            continue
 
+        if paragraph.text:
+            # 替换数字中.为 "$&$" 避免被错误分割
+            p_text = paragraph.text
+            idx = 0
+            for char in paragraph.text:
+                if char == '.' and is_number(paragraph.text[idx - 1]):
+                    p_text = replace_char_at(p_text, idx, "❤")
+                idx += 1
+
+            print(p_text)
+            [t_list.extend(e.replace("❤", ".").split("。")) for e in p_text.split('.')]
+            [paragraphs.append({'title': c_title, 'type': 'text', 'text': t}) for t in t_list if t]
+
+    tb_idx = 0
+    c_title = ' '
+    for e in doc.element.body.inner_content_elements:
+        if "CT_P" in str(e) and e.text in title_list:
+            c_title = e.text
+            title_index[c_title] = []
+        if "CT_Tbl" in str(e):
+            title_index[c_title].append(tb_idx)
+            tb_idx += 1
+
+    # TODO TABEL加段落
+    tb_idx = 0
     for table in doc.tables:
+        tb_title = ' '
+        for title in title_index:
+            if tb_idx in title_index[title]:
+                tb_title = title
+        row_idx = 1
         for row in table.rows:
             for cell in row.cells:
-                for paragraph in cell.paragraphs:
-                    _remove_framePr(paragraph._element)
+                t_list = []
+                cell_id = 0
+                if cell.text:
+                    p_text = cell.text
+                    print(p_text)
+                    idx = 0
+                    for char in cell.text:
+                        if char == '.' and is_number(cell.text[idx - 1]):
+                            p_text = replace_char_at(p_text, idx, "❤")
+                        idx += 1
 
-    doc.save('C:\\Users\\Rainbow\\Downloads\\MK-3543-008-00-DEMO-CN (convert).docx')
+                    [t_list.extend(e.replace("❤", ".").split("。")) for e in p_text.split('.')]
+                    title = tb_title + ' 行号：' + str(row_idx) + ' 列号：' + str(cell_id)
+                    for t in t_list:
+                        if t:
+                            paragraphs.append({'title': title, 'type': 'text', 'text': t})
+                cell_id += 1
+            row_idx += 1
+
+    return paragraphs
 
 
-def _remove_framePr(paragraph_element):
-    for pPr in paragraph_element.findall(qn('w:pPr')):
-        for framePr in pPr.findall(qn('w:framePr')):
-            pPr.remove(framePr)
-        for pStyle in pPr.findall(qn('w:pStyle')):
-            pPr.remove(pStyle)
-        # 添加默认样式
-        new_pStyle = OxmlElement('w:pStyle')
-        new_pStyle.set(qn('w:val'), 'Normal')
-        pPr.append(new_pStyle)
+def get_tables_index(doc):
+    index_list = []
+    idx = 0
+    for item in doc._element.body.inner_content_elements:
+        if "CT_Tbl" in str(item):
+            index_list.append(idx)
+            idx += 1
+    return index_list
 
 
-# 示例用法
-remove_framePr_from_paragraphs('C:\\Users\\Rainbow\\Downloads\\MK-3543-008-00-DEMO-CN (6).docx')
+def get_tables(docx_file):
+    doc = docx.Document(docx_file)
+    index_list = get_tables_index(doc)
+    tables = []
+    idx = 0
+    for table in doc.tables:
+        table_data = []
+        for row in table.rows:
+            row_data = []
+            for cell in row.cells:
+                row_data.append(cell.text)
+            table_data.append(row_data)
+        tables.append((index_list[idx], table_data))
+        idx += 1
+    return tables
 
-# Example usage
+
+print(get_paragraphs("C:\\Users\\Rainbow\\Desktop\\test.docx"))

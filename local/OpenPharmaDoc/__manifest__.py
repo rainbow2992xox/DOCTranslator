@@ -17,7 +17,8 @@
         'views/task.xml',
         'views/language.xml',
         'views/menu.xml',
-
+        'security/doc_security.xml',
+        'security/ir.model.access.csv',
     ],
     'assets': {
         'web.assets_backend': [

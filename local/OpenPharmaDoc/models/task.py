@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 import math
+from ..util.doc_util import *
 from ..util.util import *
 from docx import Document
 import base64
@@ -26,7 +27,7 @@ class task(models.Model):
     status = fields.Selection([('1', '未开始'), ('2', '进行中'), ('3', '已完成')], string='Status', default='1', readonly=True)
     score = fields.Float(string='Task Score', readonly=True)
     queue_task_id = fields.One2many('doc.quene.task', 'task_id', readonly=True)
-    msd_usr_id = fields.Char(related='input_file.msd_usr_id', string='MSD ID',readonly=True)
+    msd_usr_id = fields.Char(related='input_file.msd_usr_id', string='MSD ID', readonly=True)
     progress = fields.Float(string='Progress', compute='_compute_progress')
 
     @api.depends('queue_task_id')
@@ -36,6 +37,7 @@ class task(models.Model):
                 rec.progress = len(rec.queue_task_id.filtered(lambda x: x.status == '3')) / len(rec.queue_task_id) * 100
             else:
                 rec.progress = 0
+
     def open_input_file_create_form(self):
         # 获取当前记录的 id
         return {
@@ -84,37 +86,30 @@ class task(models.Model):
     def action_start(self):
         for rec in self:
             rec['status'] = '2'
-            temp_folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'temp')
-            temp_file_path = os.path.join(temp_folder_path, rec.input_file.name)
-            binary_data = base64.b64decode(rec.input_file.file)
-            with open(temp_file_path, 'wb') as f:
-                f.write(binary_data)
-
-            # 加载文档
-            doc = Document(temp_file_path)
-            os.remove(temp_file_path)
-
-            # 遍历文档中的所有段落
-            for paragraph in doc.paragraphs:
+            paragraphs = self.env['doc.paragraph'].sudo().search([('doc_file', '=', rec.input_file.id), ('type', 'in', ('1', '2'))])
+            # 遍历input文档中的所有段落
+            for paragraph in paragraphs:
                 if paragraph.text:
                     doc_quene_task = rec.env['doc.quene.task'].sudo().create(
-                        {'type': '翻译', 'status': '1', 'source_text': paragraph.text, 'target_lang': rec.output_lang.id, 'source_lang': rec.input_lang.id, 'source_file': rec.input_file.id})
+                        {'type': '翻译', 'status': '1', 'source_paragraph': paragraph.id, 'target_lang': rec.output_lang.id, 'source_lang': rec.input_lang.id, 'source_file': rec.input_file.id})
                     self.env.cr.commit()
                     rec.write({'queue_task_id': [(4, doc_quene_task.id, 0)]})
 
-            for table in doc.tables:
-                for row in table.rows:
-                    for cell in row.cells:
-                        if cell.text:
-                            doc_quene_task = self.env['doc.quene.task'].sudo().create(
-                                {'type': '翻译', 'status': '1', 'source_text': cell.text, 'target_lang': rec.output_lang.id, 'source_lang': rec.input_lang.id,
-                                 'source_file': rec.input_file.id})
-                            self.env.cr.commit()
-                            rec.write({'queue_task_id': [(4, doc_quene_task.id, 0)]})
+
+    def get_paragraph_split_num(self, paragraph):
+        t_list = []
+        p_text = paragraph.text
+        idx = 0
+        for char in paragraph.text:
+            if char == '.' and is_number(paragraph.text[idx - 1]):
+                p_text = replace_char_at(p_text, idx, "❤")
+            idx += 1
+        [t_list.extend(e.replace("❤", ".").split("。")) for e in p_text.split('.')]
+
+        return len([t for t in t_list if t])
+
 
     def create_output(self):
-        scorelist = []
-
         temp_folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'temp')
         temp_file_path = os.path.join(temp_folder_path, self.input_file.name)
         binary_data = base64.b64decode(self.input_file.file)
@@ -124,27 +119,47 @@ class task(models.Model):
         # 加载文档
         doc = Document(temp_file_path)
         os.remove(temp_file_path)
-        scorelist = []
 
-        doc_quene_tasks = self.env['doc.quene.task'].sudo().search([("source_file", "=", self.input_file.id)])
+        doc_quene_tasks = self.env['doc.quene.task'].sudo().search([("source_file", "=", self.input_file.id),("task_id","=",self.id)])
+
+
         # 遍历文档中的所有段落
+        pt_idx = 0
         for paragraph in doc.paragraphs:
+            if not paragraph.text:
+                continue
+            target_text = ''
             print(paragraph.text)
-            if paragraph.text:
+            for i in range(0, self.get_paragraph_split_num(paragraph)):
+                print(i)
                 for t in doc_quene_tasks:
-                    if paragraph.text == t['source_text']:
-                        paragraph.text = t['target_text']
+                    if 'p_' + str(pt_idx) == t.source_paragraph_idx:
+                        print(t.source_paragraph_idx)
+                        target_text += t['target_text']
+                        print(target_text)
                         break
+                pt_idx += 1
+            paragraph.text = target_text
 
+        tt_idx = 0
         for table in doc.tables:
             for row in table.rows:
                 for cell in row.cells:
+                    if not cell.text:
+                        continue
                     print(cell.text)
-                    if cell.text:
+                    target_text = ''
+                    for i in range(0, self.get_paragraph_split_num(cell)):
+                        print(i)
                         for t in doc_quene_tasks:
-                            if cell.text == t['source_text']:
-                                cell.text = t['target_text']
+                            if 't_' + str(tt_idx) == t.source_paragraph_idx:
+                                print(t.source_paragraph_idx)
+                                target_text += t['target_text']
+                                print(target_text)
                                 break
+                        tt_idx += 1
+                    cell.text = target_text
+
 
         save_path = os.path.join(temp_folder_path, self.input_file.name.replace('.docx', '—Output.docx'))
         # 保存修改后的文档
@@ -157,19 +172,18 @@ class task(models.Model):
         # 将docx文件转换为Base64编码
         docx_base64 = base64.b64encode(docx_data)
         doc_file = self.env['doc.file'].sudo().create({
-            'name': self.input_file.name.replace('.docx', '—Output.docx'),
+            'name': self.input_file.name.replace('.docx', '—translate to %s.docx'%(self.output_lang.name)),
             'file': docx_base64,
             'msd_usr_id': self.input_file.msd_usr_id,
             'doc_definition': self.input_file.doc_definition.id,
-            'lang': self.input_file.lang.id
+            'lang': self.output_lang.id
         })
 
         self.output_file = doc_file.id
         self.status = '3'
+        
         scorelist = []
         for t in self.queue_task_id:
             scorelist.append(t['score'])
 
-        self.score =  statistics.mean(scorelist)
-
-
+        self.score = statistics.mean(scorelist)

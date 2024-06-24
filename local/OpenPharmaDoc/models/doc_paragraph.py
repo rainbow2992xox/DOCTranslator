@@ -11,7 +11,9 @@ class doc_paragraph(models.Model):
                              ('2', 'Text'),
                              ('3', 'Table'),
                              ('4', 'Image')], string='Type', readonly=True, default='2')
-    index = fields.Integer(string='Index', readonly=True)
+
+    paragraph_text_idx = fields.Char(string='Paragraph text idx', readonly=True)
+
     lang = fields.Many2one('doc.lang', 'Language', readonly=True)
     doc_entitys = fields.One2many('doc.entity', 'doc_paragraph', string='Entity', readonly=True)
     doc_file = fields.Many2one('doc.file', 'From', readonly=True)

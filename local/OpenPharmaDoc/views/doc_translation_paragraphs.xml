@@ -12,8 +12,11 @@
         <field name="model">doc.translation.paragraphs</field>
         <field name="arch" type="xml">
             <tree string="Document Translation Paragraphs" default_order="create_date desc">
+                <field name="source_filename"/>
                 <field name="source_paragraph"/>
+                <field name="target_filename"/>
                 <field name="target_paragraph"/>
+                <field name="score"/>
             </tree>
         </field>
     </record>
@@ -25,9 +28,12 @@
             <form>
                 <sheet>
                     <header>
-                        <button name="action_extract" string="Extract Entity" type="object" class="btn-primary"/>
+                        <button name="action_update" string="Update" type="object" class="btn-primary"/>
                     </header>
                     <separator/>
+                    <group>
+                        <field name="score"/>
+                    </group>
                     <group col="2">
                         <group>
                             <field name="source_paragraph"/>
@@ -35,6 +41,7 @@
                         <group>
                             <field name="target_paragraph"/>
                         </group>
+
                     </group>
                 </sheet>
             </form>

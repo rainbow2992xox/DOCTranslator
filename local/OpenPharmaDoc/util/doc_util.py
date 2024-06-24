@@ -23,8 +23,10 @@ def is_number(s):
 def replace_char_at(s, index, new_char):
     return s[:index] + new_char + s[index + 1:]
 
+
 def get_spire_paragraphs(docx_file):
     pass
+
 
 def get_paragraphs(docx_file):
     doc = docx.Document(docx_file)
@@ -35,27 +37,32 @@ def get_paragraphs(docx_file):
         ' ': []
     }
 
+    p_idx = 0
     for paragraph in doc.paragraphs:
         t_list = []
         if paragraph.style.name.startswith('Heading') and paragraph.text:
             c_title = paragraph.text
-            paragraphs.append({'type': 'title', 'title': c_title, 'text': paragraph.text})
+            paragraphs.append({'type': 'title', 'title': c_title, 'text': paragraph.text, 'paragraph_text_idx': 'p_' + str(p_idx)})
             title_list.append(c_title)
+            p_idx += 1
             continue
 
         if paragraph.text:
             # 替换数字中.为 "$&$" 避免被错误分割
             p_text = paragraph.text
             idx = 0
-            for char in p_text:
-                if char == '.' and is_number(p_text[idx - 1]):
-                    p_text = replace_char_at(p_text, idx, "$&$")
+            for char in paragraph.text:
+                if char == '.' and is_number(paragraph.text[idx - 1]):
+                    p_text = replace_char_at(p_text, idx, "❤")
                 idx += 1
 
             print(p_text)
-            [t_list.extend(e.replace("$&$", ".").split("。")) for e in p_text.split('.')]
-            [paragraphs.append({'title': c_title, 'type': 'text', 'text': t}) for t in t_list if t]
+            [t_list.extend(e.replace("❤", ".").split("。")) for e in p_text.split('.')]
 
+            for t in t_list:
+                if t:
+                    paragraphs.append({'title': c_title, 'type': 'text', 'text': t, 'paragraph_text_idx': 'p_' + str(p_idx)})
+                    p_idx += 1
 
     tb_idx = 0
     c_title = ' '
@@ -67,14 +74,14 @@ def get_paragraphs(docx_file):
             title_index[c_title].append(tb_idx)
             tb_idx += 1
 
-    # TODO TABEL加段落
     tb_idx = 0
+    tt_idx = 0
     for table in doc.tables:
         tb_title = ' '
         for title in title_index:
             if tb_idx in title_index[title]:
                 tb_title = title
-        row_idx =1
+        row_idx = 1
         for row in table.rows:
             for cell in row.cells:
                 t_list = []
@@ -83,16 +90,18 @@ def get_paragraphs(docx_file):
                     p_text = cell.text
                     print(p_text)
                     idx = 0
-                    for char in p_text:
-                        if char == '.' and is_number(p_text[idx - 1]):
-                            p_text = replace_char_at(p_text, idx, "$&$")
+                    for char in cell.text:
+                        if char == '.' and is_number(cell.text[idx - 1]):
+                            p_text = replace_char_at(p_text, idx, "❤")
                         idx += 1
 
-                    [t_list.extend(e.replace("$&$", ".").split("。")) for e in p_text.split('.')]
+                    [t_list.extend(e.replace("❤", ".").split("。")) for e in p_text.split('.')]
                     title = tb_title + ' 行号：' + str(row_idx) + ' 列号：' + str(cell_id)
                     for t in t_list:
                         if t:
-                            paragraphs.append({'title': title, 'type': 'text', 'text': t})
+                            paragraphs.append({'title': title, 'type': 'text', 'text': t, 'paragraph_text_idx': 't_' + str(tt_idx)})
+                            tt_idx += 1
+
                 cell_id += 1
             row_idx += 1
 
