@@ -43,8 +43,8 @@ class quene_task(models.Model):
     score = fields.Float(string='Trans Score', readonly=True)
 
     def upload(self, msd_id=None):
-        folder_path = 'C:\\Users\\Rainbow\\Desktop\\Odoo\\DocTranslator\\data'
-        # folder_path = '/home'
+        # folder_path = 'C:\\Users\\Rainbow\\Desktop\\Odoo\\DocTranslator\\data'
+        folder_path = '/home'
         translation_files = import_corpus(folder_path, msd_id)
         fail_list = []
         for t in translation_files:
