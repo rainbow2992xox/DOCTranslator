@@ -83,18 +83,37 @@ class task(models.Model):
                     source_a_attribute_values.append(source_a_attribute['value'])
         return source_a_attribute_values
 
+    # def action_start(self):
+    #     for rec in self:
+    #         rec['status'] = '2'
+    #         paragraphs = self.env['doc.paragraph'].sudo().search([('doc_file', '=', rec.input_file.id), ('type', 'in', ('1', '2'))])
+    #         # 遍历input文档中的所有段落
+    #         for paragraph in paragraphs:
+    #             if paragraph.text:
+    #                 doc_quene_task = rec.env['doc.quene.task'].sudo().create(
+    #                     {'type': '翻译', 'status': '1', 'source_paragraph': paragraph.id, 'target_lang': rec.output_lang.id, 'source_lang': rec.input_lang.id, 'source_file': rec.input_file.id})
+    #                 self.env.cr.commit()
+    #                 rec.write({'queue_task_id': [(4, doc_quene_task.id, 0)]})
+
     def action_start(self):
         for rec in self:
             rec['status'] = '2'
             paragraphs = self.env['doc.paragraph'].sudo().search([('doc_file', '=', rec.input_file.id), ('type', 'in', ('1', '2'))])
-            # 遍历input文档中的所有段落
+            doc_quene_tasks = []
             for paragraph in paragraphs:
                 if paragraph.text:
-                    doc_quene_task = rec.env['doc.quene.task'].sudo().create(
-                        {'type': '翻译', 'status': '1', 'source_paragraph': paragraph.id, 'target_lang': rec.output_lang.id, 'source_lang': rec.input_lang.id, 'source_file': rec.input_file.id})
-                    self.env.cr.commit()
-                    rec.write({'queue_task_id': [(4, doc_quene_task.id, 0)]})
-
+                    doc_quene_tasks.append({
+                        'type': '翻译',
+                        'status': '1',
+                        'source_paragraph': paragraph.id,
+                        'target_lang': rec.output_lang.id,
+                        'source_lang': rec.input_lang.id,
+                        'source_file': rec.input_file.id
+                    })
+            if doc_quene_tasks:
+                created_tasks = self.env['doc.quene.task'].sudo().create(doc_quene_tasks)
+                rec.write({'queue_task_id': [(4, task.id, 0) for task in created_tasks]})
+            self.env.cr.commit()
 
     def get_paragraph_split_num(self, paragraph):
         t_list = []

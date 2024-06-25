@@ -173,7 +173,7 @@ class doc_translation_files(models.Model):
                                  'source_lang': rec.source.lang.id, 'source_file': rec.source.id,
                                  'target_file': rec.target.id, 'translation_file_id': rec.id})
 
-                            rec.queue_task_id = [(4, 0, doc_quene_task.ids)]
+                            rec.queue_task_id = [(4, doc_quene_task.id, 0)]
                             target_ids = []
                             source_ids = []
 
