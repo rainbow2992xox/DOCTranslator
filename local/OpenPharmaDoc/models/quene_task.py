@@ -124,7 +124,7 @@ class quene_task(models.Model):
         # 没有进行中的任务则执行
         processing_align_tasks = self.env["doc.quene.task"].sudo().search([("status", "=", "2")], order='create_date asc')
         translator_tasks = self.env["doc.quene.task"].sudo().search([("status", "=", "1"), ("type", "=", "翻译")], order='create_date asc', limit=128)
-        if not processing_align_tasks.ids and translator_tasks.ids:
+        if not processing_align_tasks.ids and translator_tasks.ids and not align_tasks.ids:
             trans_technical_terms = {}
             # TODO 临时代码
             temp_folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'temp')
