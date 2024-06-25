@@ -119,7 +119,6 @@ class quene_task(models.Model):
                     rec.status = '3'
                 else:
                     rec.status = '4'
-                break
 
         # 没有进行中的任务则执行
         processing_align_tasks = self.env["doc.quene.task"].sudo().search([("status", "=", "2")], order='create_date asc')
