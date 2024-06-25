@@ -6,8 +6,8 @@ import requests
 import sys
 
 # url = 'http://101.35.211.193:31002'
-url = 'https://ac344ht1868.vicp.fun'
-# url = 'http://languagerepo-devtest.merck.com:30124'
+# url = 'https://ac344ht1868.vicp.fun'
+url = 'http://languagerepo-devtest.merck.com:30124'
 # url = 'http://lit-research-poc.merck.com:30124'
 
 n_jobs = 64
