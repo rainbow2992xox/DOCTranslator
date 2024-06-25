@@ -15,8 +15,8 @@
                 <field name="create_date"/>
                 <field name="name"/>
                 <field name="file" filename="name"/>
-                <field name="doc_definition"/>
-                <field name="doc_paragraphs"/>
+<!--                <field name="doc_definition"/>-->
+<!--                <field name="doc_paragraphs"/>-->
                 <field name="lang"/>
             </tree>
         </field>
@@ -36,9 +36,9 @@
                         <field name="msd_usr_id"/>
                         <field name="lang"/>
                     </group>
-                    <group>
-                        <field name="doc_paragraphs"/>
-                    </group>
+<!--                    <group>-->
+<!--                        <field name="doc_paragraphs"/>-->
+<!--                    </group>-->
                 </sheet>
             </form>
         </field>
