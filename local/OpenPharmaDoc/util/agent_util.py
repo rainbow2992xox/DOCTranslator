@@ -10,7 +10,7 @@ import sys
 url = 'http://languagerepo-devtest.merck.com:30124'
 # url = 'http://lit-research-poc.merck.com:30124'
 
-n_jobs = 64
+n_jobs = 32
 
 def agent_align(doc_dict):
     payload = {
