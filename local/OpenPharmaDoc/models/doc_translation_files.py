@@ -167,7 +167,7 @@ class doc_translation_files(models.Model):
                         source_text_list = []
 
                         # 排除纯数字字母符号段落,不生成重复对齐内容
-                        if target_list or source_list:
+                        if target_list.ids and source_list.ids:
                             doc_quene_task = self.env['doc.quene.task'].sudo().create(
                                 {'type': '对齐', 'status': '1', 'target_lang': rec.target.lang.id,
                                  'source_lang': rec.source.lang.id, 'source_file': rec.source.id,
@@ -200,7 +200,7 @@ class doc_translation_files(models.Model):
                     source_list = self.env['doc.paragraph'].sudo().search([('doc_file', '=', rec.source.id), ('type', '=', '2')])
                     target_text_list = []
                     source_text_list = []
-                    if target_list or source_list:
+                    if target_list.ids and source_list.ids:
                         doc_quene_task = self.env['doc.quene.task'].sudo().create(
                             {'type': '对齐', 'status': '1', 'target_lang': rec.target.lang.id,
                              'source_lang': rec.source.lang.id, 'source_file': rec.source.id,
