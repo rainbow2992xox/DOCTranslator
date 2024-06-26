@@ -166,26 +166,27 @@ class doc_translation_files(models.Model):
                         target_text_list = []
                         source_text_list = []
 
+                        target_ids = []
+                        source_ids = []
+
+                        for tp in target_list:
+                            if is_corpus(tp.text.strip(' ')) and tp.text.strip(' ') not in target_text_list:
+                                target_ids.append(tp.id)
+                                target_text_list.append(tp.text.strip(' '))
+
+                        for sp in source_list:
+                            if is_corpus(sp.text.strip(' ')) and sp.text.strip(' ') not in source_text_list:
+                                source_ids.append(sp.id)
+                                source_text_list.append(sp.text.strip(' '))
+
                         # 排除纯数字字母符号段落,不生成重复对齐内容
-                        if target_list.ids and source_list.ids:
+                        if target_ids and source_ids:
                             doc_quene_task = self.env['doc.quene.task'].sudo().create(
                                 {'type': '对齐', 'status': '1', 'target_lang': rec.target.lang.id,
                                  'source_lang': rec.source.lang.id, 'source_file': rec.source.id,
                                  'target_file': rec.target.id, 'translation_file_id': rec.id})
 
                             rec.queue_task_id = [(4, doc_quene_task.id, 0)]
-                            target_ids = []
-                            source_ids = []
-
-                            for tp in target_list:
-                                if  is_corpus(tp.text.strip(' ')) and tp.text.strip(' ') not in target_text_list:
-                                    target_ids.append(tp.id)
-                                    target_text_list.append(tp.text.strip(' '))
-
-                            for sp in source_list:
-                                if  is_corpus(sp.text.strip(' ')) and sp.text.strip(' ') not in source_text_list:
-                                    source_ids.append(sp.id)
-                                    source_text_list.append(sp.text.strip(' '))
 
                             # 排除纯数字段落
                             doc_quene_task.target_align_paragraphs = [(6, 0, target_ids)]
