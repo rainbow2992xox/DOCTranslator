@@ -42,7 +42,7 @@ def get_paragraphs(docx_file):
         t_list = []
 
         print(paragraph.style.name)
-        if paragraph.style.name.startswith('Heading') and paragraph.text:
+        if 'Heading' in paragraph.style.name and paragraph.text:
             print('Title:'+ paragraph.text)
             c_title = paragraph.text
             paragraphs.append({'type': 'title', 'title': c_title, 'text': paragraph.text, 'paragraph_text_idx': 'p_' + str(p_idx)})
